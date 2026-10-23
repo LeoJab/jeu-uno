@@ -95,7 +95,8 @@ input[type=text]:focus{box-shadow:3px 3px 0 var(--ink)}
 .tchip.hot{background:var(--r)}
 
 /* ---------- sièges autour de la table ---------- */
-.av{width:32px;height:32px;flex:none;border-radius:50%;border:3px solid var(--ink);display:grid;place-items:center;color:#fff;font-weight:900;font-size:15px;text-shadow:1px 1px 0 var(--ink);line-height:1}
+.av img{position:absolute;inset:0;width:100%;height:100%;object-fit:cover;border-radius:50%}
+.av{position:relative;overflow:hidden;width:32px;height:32px;flex:none;border-radius:50%;border:3px solid var(--ink);display:grid;place-items:center;color:#fff;font-weight:900;font-size:15px;text-shadow:1px 1px 0 var(--ink);line-height:1}
 #seats{position:absolute;inset:0;pointer-events:none}
 .seat{position:absolute;translate:-50% -50%;pointer-events:auto;display:flex;align-items:center;gap:9px;background:#fff;border:3px solid var(--ink);border-radius:16px;box-shadow:4px 4px 0 var(--ink);padding:6px 11px 6px 6px;transition:left .4s,top .4s,background .25s,scale .25s,box-shadow .25s;z-index:3;width:max-content;max-width:190px}
 .seat.turn{background:var(--yellow);scale:1.12;z-index:6;box-shadow:4px 4px 0 var(--ink),0 0 0 4px #fff,0 0 34px 10px rgba(255,212,38,.85)}
@@ -271,6 +272,15 @@ input[type=text]:focus{box-shadow:3px 3px 0 var(--ink)}
 #confetti{position:fixed;inset:0;pointer-events:none;z-index:75;width:100%;height:100%}
 #toast{position:fixed;left:50%;bottom:calc(var(--cw)*1.46 + 70px);transform:translateX(-50%);background:var(--ink);color:#fff;padding:8px 16px;border-radius:999px;font-weight:900;font-size:14px;z-index:90;opacity:0;transition:opacity .2s;pointer-events:none;white-space:nowrap;max-width:92vw;overflow:hidden;text-overflow:ellipsis}
 #toast.on{opacity:1}
+#recv{position:fixed;left:50%;bottom:calc(var(--cw)*1.46 + 100px);transform:translateX(-50%);z-index:65;display:none;flex-direction:column;align-items:center;gap:6px;background:#fff;border:3px solid var(--ink);border-radius:16px;box-shadow:4px 4px 0 var(--ink);padding:8px 12px;pointer-events:none;max-width:92vw}
+#recv b{font-size:14px;white-space:nowrap}
+#recv .rc{display:flex;gap:5px;flex-wrap:wrap;justify-content:center;--cw:42px}
+#recv .rc .card{border-width:2px;box-shadow:2px 2px 0 var(--ink)}
+#recv .rc .card .mid{border-width:2px;box-shadow:none}
+#hand .card.fresh{animation:freshglow 3s ease-out forwards}
+#hand .card.fresh::after{content:'NEW';position:absolute;top:3px;left:50%;transform:translateX(-50%);background:var(--yellow);color:var(--ink);border:2px solid var(--ink);border-radius:999px;font-size:10px;font-weight:900;padding:0 6px;letter-spacing:.5px;animation:freshtag 3s ease-out forwards;z-index:3}
+@keyframes freshglow{0%,70%{box-shadow:3px 3px 0 var(--ink),0 0 0 3px var(--yellow),0 0 22px 6px var(--yellow)}100%{}}
+@keyframes freshtag{0%,75%{opacity:1}100%{opacity:0}}
 
 @media (max-height:700px){:root{--cw:clamp(48px,12vw,72px)}#reacts button{width:32px;height:32px;font-size:17px}}
 @media (max-width:560px){.seat{flex-direction:column;gap:3px;padding:5px 6px 4px;text-align:center;max-width:94px;border-radius:14px}.seat .av{width:34px;height:34px;font-size:15px}.seat .nm{max-width:82px;font-size:12px}.seat .sub{font-size:10.5px}.minis{display:none}.cntb{min-width:22px;height:22px;font-size:13px}}
@@ -354,6 +364,7 @@ input[type=text]:focus{box-shadow:3px 3px 0 var(--ink)}
 <div id="banner"><span class="t"></span><span class="s"></span></div>
 <div id="modal" class="hidden"><div class="box panel"></div></div>
 <div id="toast"></div>
+<div id="recv"></div>
 
 <script src="/_sdk.js"></script>
 <script>
@@ -395,13 +406,21 @@ function lsGet(k, d){ try { const v = localStorage.getItem(k); return v==null ? 
 function lsSet(k, v){ try { localStorage.setItem(k, JSON.stringify(v)); } catch(e){} }
 function lsDel(k){ try { localStorage.removeItem(k); } catch(e){} }
 function hueOf(id){ let h=0; for (const ch of String(id)) h = (h*31 + ch.charCodeAt(0)) >>> 0; return h % 360; }
+let myAvatar = null; const avMap = {};
+const okUrl = u => typeof u === 'string' && /^https:\/\//.test(u) && u.length < 500;
+function avatarOf(p){
+  if (!p || p.bot) return null;
+  const u = (typeof S !== 'undefined' && S && S.av && S.av[p.id]) || avMap[p.id] || p.avatar || (p.id === myId ? myAvatar : null);
+  return okUrl(u) ? u : null;
+}
 function avHTML(p){
   const ini = p.bot ? '🤖' : esc((p.name||'?').trim().charAt(0).toUpperCase() || '?');
-  return `<span class="av" style="background:hsl(${hueOf(p.id)} 75% 52%)">${ini}</span>`;
+  const url = avatarOf(p);
+  return `<span class="av" style="background:hsl(${hueOf(p.id)} 75% 52%)">${ini}${url ? `<img src="${esc(url)}" alt="" referrerpolicy="no-referrer" onerror="this.remove()">` : ''}</span>`;
 }
 
 const BOT_NAMES = ['Bot Kévin','Bot Josiane','Bot Jean-Mich','Bot Ginette','Bot Brandon','Bot Huguette','Bot Titouan','Bot Raymonde','Bot Kylian','Bot Mamie Lulu'];
-const DEFAULT_OPTS = {stack:true, chal:true, target:500, speed:'normal'};
+const DEFAULT_OPTS = {stack:true, chal:true, noBlackEnd:true, target:500, speed:'normal'};
 
 /* =====================================================================
    MOTEUR
@@ -417,6 +436,10 @@ function canPlay(S, cid){
   if (S.drawn != null && cid !== S.drawn) return false;
   const c = CARDS[cid];
   if (S.stack > 0) return c.v === 'D';
+  if (c.c === 'k' && S.opts && S.opts.noBlackEnd !== false){
+    const cur = S.players[S.turn];
+    if (cur && S.hands[cur.id] && S.hands[cur.id].length === 1) return false; // pas le droit de finir sur un Joker
+  }
   const t = topCard(S);
   return c.c === 'k' || c.c === S.color || c.v === t.v;
 }
@@ -443,7 +466,7 @@ function lobbyState(prev){
   return {
     v: (prev ? prev.v : 0) + 1, phase:'lobby',
     opts: Object.assign({}, DEFAULT_OPTS, lsGet('uno-opts', {}), prev ? prev.opts : {}),
-    bots: prev ? prev.bots : [], players: [], scores: {}, log: [], ev: [], round: 0
+    bots: prev ? prev.bots : [], av: prev && prev.av ? prev.av : {}, players: [], scores: {}, log: [], ev: [], round: 0
   };
 }
 
@@ -499,15 +522,14 @@ function doAct(S, pid, a){
       if (card.c === 'k' && !COLORS.includes(a.col)) return false;
       clearVuln(S, pid);
       const prev = S.color;
-      const hadColor = hand.some(x => x !== cid && CARDS[x].c === prev);
+      const hadOther = hand.some(x => x !== cid && CARDS[x].v !== 'F' && canPlay(S, x)); // il pouvait jouer autre chose ?
       hand.splice(hand.indexOf(cid), 1);
       S.disc.push(cid); S.color = card.c === 'k' ? a.col : card.c; S.drawn = null;
-      if (a.uno && hand.length === 1) S.said[pid] = true;
       S.ev.push({k:'play', p:pid, c:cid, col:S.color});
       log(S, `${me.name} pose ${cardName(cid)}${card.c==='k' ? ' → '+CNAME[S.color] : ''}`, card.c === 'k' ? 'k' + S.color : S.color);
       if (hand.length === 1){
         if (S.said[pid]){ S.ev.push({k:'uno', p:pid}); log(S, `📣 ${me.name} : « UNO ! »`); }
-        else S.vuln = pid;
+        else { S.vuln = pid; S.vulnAt = Date.now(); }
       }
       const n = S.players.length, nx = nextIdx(S, i), win = hand.length === 0, nxp = S.players[nx];
       switch (card.v){
@@ -523,7 +545,7 @@ function doAct(S, pid, a){
         case 'W': S.ev.push({k:'wild', col:S.color}); advance(S, 1); break;
         case 'F':
           S.ev.push({k:'wild4', col:S.color, p:nxp.id});
-          if (S.opts.chal && !win){ S.chal = {from:i, to:nx, legal:!hadColor}; S.turn = nx; S.drawn = null; S.turnAt = Date.now(); }
+          if (S.opts.chal && !win){ S.chal = {from:i, to:nx, legal:!hadOther}; S.turn = nx; S.drawn = null; S.turnAt = Date.now(); }
           else { log(S, `💀 ${nxp.name} pioche 4 et passe`); drawN(S, nx, 4); advance(S, 2); }
           break;
         default: advance(S, 1);
@@ -594,17 +616,17 @@ function botMove(S, pid){
   const hand = S.hands[pid];
   if (S.chal){ if (S.chal.to !== i) return null; return {t: Math.random() < .27 ? 'contest' : 'accept'}; }
   if (i !== S.turn) return null;
-  const mk = c => ({t:'play', c, col: CARDS[c].c==='k' ? bestColor(hand.filter(x => x!==c)) : undefined, uno: hand.length===2 && Math.random() < .85});
+  const mk = c => ({t:'play', c, col: CARDS[c].c==='k' ? bestColor(hand.filter(x => x!==c)) : undefined});
   if (S.drawn != null) return canPlay(S, S.drawn) ? mk(S.drawn) : {t:'pass'};
   const playable = hand.filter(c => canPlay(S, c));
   if (!playable.length) return {t:'draw'};
   const nx = S.players[nextIdx(S, i)], danger = S.hands[nx.id].length <= 2;
   const cnt = {r:0,y:0,g:0,b:0}; for (const c of hand){ const cc = CARDS[c].c; if (cc !== 'k') cnt[cc]++; }
-  const hasColor = hand.some(c => CARDS[c].c === S.color);
+  const hasOther = playable.some(c => CARDS[c].v !== 'F');
   let best = null, bs = -1e9;
   for (const c of playable){
     const k = CARDS[c]; let s;
-    if (k.c === 'k') s = k.v === 'W' ? 3 : (hasColor ? -4 : 1);
+    if (k.c === 'k') s = k.v === 'W' ? 3 : (hasOther ? -4 : 1);
     else {
       s = 10 + cnt[k.c]*1.6;
       if (isNaN(+k.v)) s += danger ? 14 : 2; else s += (+k.v)/3;
@@ -630,7 +652,7 @@ let S = null;             // état courant
 let myId = 'me', myName = 'Toi';
 let presence = [];        // [{id,name}] joueurs connectés à la salle
 let room = null, roomCode = null;
-let unoArmed = false, pendingAct = 0, summaryTimer = null, summaryClosed = false;
+let pendingAct = 0, summaryTimer = null, summaryClosed = false, fresh = {ids:new Set(), until:0};
 let hostTimers = [];
 
 const isHost = () => mode === 'solo' || (presence.length > 0 && presence[0].id === myId);
@@ -642,10 +664,18 @@ function receive(ns, silent){
   if (S && ns.v <= S.v) return;
   const old = S;
   const pre = captureRects(ns);
+  const oldHand = old && old.hands && old.hands[myId] && old.phase === 'play' ? old.hands[myId] : null;
   S = ns; pendingAct = 0;
-  const hand = myHand();
-  if (!hand || hand.length !== 2) unoArmed = false;
   if (!old || old.phase !== S.phase) summaryClosed = false;
+  // l'hôte a lancé la suite : on ferme le résumé chez tout le monde
+  if (old && old.phase !== S.phase && (old.phase === 'roundEnd' || old.phase === 'gameEnd')){ clearTimeout(summaryTimer); closeModal(); }
+  // cartes que je viens de recevoir
+  const h = myHand();
+  if (!silent && h && oldHand && S.ev && S.ev.some(e => e.k === 'draw' && e.p === myId)){
+    const got = h.filter(c => !oldHand.includes(c));
+    if (got.length){ fresh = {ids:new Set(got), until:Date.now() + 3200}; pre.got = got; }
+  }
+  if (!silent && S.vuln === myId && (!old || old.vuln !== myId)) toast('⚠️ Plus qu\'une carte : clique vite sur UNO !');
   render();
   if (!silent && S.ev && S.ev.length) runFx(S.ev, pre, old);
   else if (!silent) turnPing(old);
@@ -659,6 +689,8 @@ function receive(ns, silent){
 function commit(ns){
   if (!ns) return;
   if (mode === 'online' && room){
+    ns.av = Object.assign({}, avMap, ns.av || {});
+    for (const k of Object.keys(ns.av)) if (!okUrl(ns.av[k])) delete ns.av[k];
     while (JSON.stringify(ns).length > 11500 && ns.log.length > 3) ns.log.shift();
     try { room.send({t:'state', s:ns}, {keep:true}); } catch(e){ console.warn(e); }
   } else if (mode === 'solo') {
@@ -704,7 +736,9 @@ function scheduleHost(){
   const v = S.v;
   const later = (ms, fn) => hostTimers.push(setTimeout(() => { if (S && S.v === v && S.phase === 'play') fn(); }, ms));
   if (cur && isAuto(cur)){
-    later(rnd(sp[0], sp[1]) + (S.ev && S.ev.some(e => ['wild4','stack','win','deal','caught','busted'].includes(e.k)) ? 700 : 0), () => {
+    // si quelqu'un vient de passer à 1 carte, on laisse ~3 s pour crier UNO / Contre-Uno
+    const unoWait = S.vuln && S.vuln !== cur.id ? Math.max(0, 3000 - (Date.now() - (S.vulnAt || 0))) : 0;
+    later(Math.max(unoWait, rnd(sp[0], sp[1]) + (S.ev && S.ev.some(e => ['wild4','stack','win','deal','caught','busted'].includes(e.k)) ? 700 : 0)), () => {
       const ns = act(S, cur.id, botMove(S, cur.id)); if (ns) commit(ns);
     });
   } else if (cur && mode === 'online'){
@@ -714,12 +748,12 @@ function scheduleHost(){
   }
   if (S.vuln){
     const vp = S.players[seatOf(S, S.vuln)];
-    if (vp && isAuto(vp) && Math.random() < .55){
-      later(TURBO ? 10 : rnd(1300, 3200), () => { const ns = act(S, vp.id, {t:'uno'}); if (ns) commit(ns); });
+    if (vp && isAuto(vp) && Math.random() < .85){
+      later(TURBO ? 10 : rnd(700, 2600), () => { const ns = act(S, vp.id, {t:'uno'}); if (ns) commit(ns); });
     }
     const bots = S.players.filter(p => p.bot && p.id !== S.vuln);
     if (bots.length && Math.random() < .7){
-      later(TURBO ? 12 : rnd(1500, 3400), () => { const b = pick(bots); const ns = act(S, b.id, {t:'catch', p:S.vuln}); if (ns) commit(ns); });
+      later(TURBO ? 12 : rnd(1300, 3000), () => { const b = pick(bots); const ns = act(S, b.id, {t:'catch', p:S.vuln}); if (ns) commit(ns); });
     }
   }
 }
@@ -794,6 +828,7 @@ function joinRoom(code, create){
   room.on('ready', info => {
     myId = info.me; presence = info.players || [];
     const me = presence.find(p => p.id === myId); if (me) myName = me.name;
+    if (myAvatar){ avMap[myId] = myAvatar; try { room.send({t:'av', url:myAvatar}); } catch(e){} }
     if (info.last && info.last.t === 'state' && info.last.s){ receive(info.last.s, true); }
     if (!S && isHost()){ const L = lobbyState(null); L.players = lobbyPlayers(L); commit(L); }
     hostLobbyRefresh();
@@ -803,6 +838,7 @@ function joinRoom(code, create){
     const before = presence.map(p => p.id);
     const wasHost = isHost();
     presence = list || [];
+    if (myAvatar && presence.some(p => !before.includes(p.id) && p.id !== myId)){ try { room.send({t:'av', url:myAvatar}); } catch(e){} }
     for (const p of presence) if (!before.includes(p.id) && before.length && p.id !== myId && S && S.phase !== 'lobby') toast(`👋 ${p.name} débarque`);
     if (!S && isHost()){ const L = lobbyState(null); L.players = lobbyPlayers(L); commit(L); }
     hostLobbyRefresh();
@@ -813,6 +849,12 @@ function joinRoom(code, create){
   room.on('message', (d, from) => {
     if (!d || typeof d !== 'object') return;
     if (d.t === 'state') receive(d.s, false);
+    else if (d.t === 'av'){
+      if (!from || !okUrl(d.url) || avMap[from.id] === d.url) { if (from && okUrl(d.url) && isHost() && S && (!S.av || S.av[from.id] !== d.url)) hostUpdate(L => { L.av = Object.assign({}, L.av, {[from.id]: d.url}); }); return; }
+      avMap[from.id] = d.url;
+      if (isHost() && S) hostUpdate(L => { L.av = Object.assign({}, L.av, {[from.id]: d.url}); });
+      else render();
+    }
     else if (d.t === 'act'){ if (isHost() && from && from.id !== myId) hostHandle(from.id, d.a, d.v); }
     else if (d.t === 'emo'){
       let pid = from && from.id;
@@ -889,7 +931,8 @@ function renderLobby(){
       ${host && S.players.length < 8 ? `<button class="btn small white" id="addBot">+ 🤖 Bot</button>` : ''}
     </div>
     ${sw('stack', 'Cumul des +2 <span style="color:var(--r)">(règle maison)</span>', 'Tu peux répondre à un +2 par un autre +2 : le suivant se prend tout le paquet. Ça peut faire très mal.')}
-    ${sw('chal', 'Contester les +4 (règle officielle)', 'Un +4 ne se joue que sans carte de la couleur demandée. Bluff démasqué = +4 pour le tricheur, sinon +6 pour toi.')}
+    ${sw('chal', 'Contester les +4', 'Un +4 ne se joue que si tu n\'as rien d\'autre à poser. Le suivant peut contester : si tu pouvais jouer autre chose, c\'est toi qui pioches 4, sinon il pioche 6.')}
+    ${sw('noBlackEnd', 'Interdit de finir sur un Joker', 'Ta dernière carte ne peut pas être un Joker ou un +4 : tu devras piocher jusqu\'à pouvoir finir avec une carte de couleur.')}
     ${seg('target', 'Fin de partie', 'Une manche sèche ou on compte les points.', [[0,'1 manche'],[250,'250 pts'],[500,'500 pts']])}
     ${seg('speed', 'Vitesse des bots', 'Leur temps de réflexion.', [['slow','Cool'],['normal','Normale'],['fast','Rapide']])}
     <div class="modal-actions">
@@ -1073,7 +1116,8 @@ function renderHand(){
   const n = sorted.length;
   let step = n > 1 ? Math.min(cw * 0.78, (W - cw) / (n - 1)) : cw;
   step = Math.max(step, 22);
-  hw.innerHTML = sorted.map((c, k) => cardHTML(c, (myTurn ? (canPlay(S,c) ? 'ok' : 'no') : '') + (c === S.drawn ? ' ok' : ''))
+  const isFresh = c => Date.now() < fresh.until && fresh.ids.has(c);
+  hw.innerHTML = sorted.map((c, k) => cardHTML(c, (myTurn ? (canPlay(S,c) ? 'ok' : 'no') : '') + (c === S.drawn ? ' ok' : '') + (isFresh(c) ? ' fresh' : ''))
     .replace('class="card', `style="margin-left:${k ? (step - cw).toFixed(1) : 0}px;z-index:${k+1}" class="card`)).join('');
   hw.querySelectorAll('.card').forEach(el => el.onclick = () => onCard(+el.dataset.id, el));
 }
@@ -1092,9 +1136,8 @@ function renderActions(){
     } else if (myTurn && S.drawn != null){
       html += `<button class="btn white" data-a="pass">Garder et passer ⏭</button>`;
     }
-    if (h && (h.length === 2 || (h.length === 1 && S.vuln === myId))){
-      const urgent = h.length === 1;
-      html += `<button class="btn ${unoArmed?'armed':''} ${urgent?'urgent':''}" id="unoBtn">${urgent ? 'UNO !!!' : (unoArmed ? 'UNO ✔' : 'UNO !')}</button>`;
+    if (h && h.length === 1 && S.vuln === myId){
+      html += `<button class="btn urgent" id="unoBtn">UNO !!!</button>`;
     }
     if (S.vuln && S.vuln !== myId){
       html += `<button class="btn red" data-catch="${esc(S.vuln)}">🫵 Contre-Uno sur ${esc(nameOf(S, S.vuln))} !</button>`;
@@ -1108,9 +1151,7 @@ function renderActions(){
   const ub = $('#unoBtn');
   if (ub) ub.onclick = () => {
     initAudio();
-    const hh = myHand();
-    if (hh.length === 1){ sendAct({t:'uno'}); }
-    else { unoArmed = !unoArmed; sfx.click(); if (unoArmed) toast('UNO armé : il sera crié en posant ta carte 📣'); renderActions(); }
+    sendAct({t:'uno'});
   };
   const rb = $('#resBtn'); if (rb) rb.onclick = showSummary;
 }
@@ -1121,8 +1162,8 @@ function onCard(cid, el){
   if (!S || S.phase !== 'play') return;
   const mi = seatOf(S, myId);
   if (mi !== S.turn || S.chal){ wiggle(el); toast(S.chal && S.chal.to === mi ? 'Réponds d\'abord au +4 !' : 'Pas ton tour, patience 😤'); return; }
-  if (!canPlay(S, cid)){ wiggle(el); sfx.nope(); toast(S.stack > 0 ? `Pose un +2 ou prends +${S.stack}` : S.drawn != null ? 'Tu ne peux poser que la carte piochée' : 'Cette carte ne passe pas'); return; }
-  const go = col => { sendAct({t:'play', c:cid, col, uno: unoArmed && myHand().length === 2}); unoArmed = false; };
+  if (!canPlay(S, cid)){ wiggle(el); sfx.nope(); toast(CARDS[cid].c === 'k' && myHand().length === 1 && S.opts.noBlackEnd !== false ? 'Interdit de finir sur un Joker : pioche ! 🚫' : S.stack > 0 ? `Pose un +2 ou prends +${S.stack}` : S.drawn != null ? 'Tu ne peux poser que la carte piochée' : 'Cette carte ne passe pas'); return; }
+  const go = col => sendAct({t:'play', c:cid, col});
   if (CARDS[cid].c === 'k') pickColor(go); else go();
 }
 function wiggle(el){ if (el && el.animate) el.animate([{transform:'translateX(0)'},{transform:'translateX(-6px) rotate(-3deg)'},{transform:'translateX(6px) rotate(3deg)'},{transform:'translateX(0)'}], {duration:260}); }
@@ -1187,10 +1228,10 @@ function showRules(){
     <ul><li><b>⊘ Passe ton tour</b> : le suivant saute son tour.</li>
     <li><b>⇄ Inversion</b> : le sens change (à 2, ça fait passer le tour).</li>
     <li><b>+2</b> : le suivant pioche 2 et passe.${o.stack ? ' <b>Cumul activé</b> : il peut répondre avec un +2, et le suivant se prend tout.' : ''}</li>
-    <li><b>★ Joker</b> : tu choisis la couleur.</li>
-    <li><b>+4</b> : tu choisis la couleur, le suivant pioche 4 et passe.${o.chal ? ' Normalement interdit si tu as la couleur demandée : il peut <b>contester</b> (bluff prouvé = +4 pour toi, sinon +6 pour lui).' : ''}</li></ul>
+    <li><b>★ Joker</b> : tu choisis la couleur.</li>${o.noBlackEnd !== false ? '<li><b>Interdit de finir sur un Joker ou un +4</b> : ta dernière carte doit être une carte de couleur.</li>' : ''}
+    <li><b>+4</b> : tu choisis la couleur, le suivant pioche 4 et passe.${o.chal ? ' Il ne se joue que si tu n\'as rien d\'autre à poser : le suivant peut <b>contester</b> (si tu pouvais jouer autre chose = +4 pour toi, sinon +6 pour lui).' : ''}</li></ul>
     <h3>UNO !</h3>
-    <p>Quand tu poses ton avant-dernière carte, appuie sur <b>UNO !</b> avant (le bouton s'arme) ou juste après. Si quelqu'un clique <b>Contre-Uno</b> avant le coup suivant, tu pioches 2.</p>
+    <p>Dès que tu n'as plus qu'une carte, le bouton <b>UNO !</b> apparaît : clique vite ! Tant que tu ne l'as pas fait, les autres voient un bouton <b>Contre-Uno</b> : le premier qui clique gagne. Si tu te fais griller, tu pioches 2. Le joueur suivant a 3 secondes de délai pour laisser le temps à tout le monde.</p>
     <h3>Points</h3>
     <p>Le gagnant de la manche marque les cartes restées chez les autres : chiffres = leur valeur, ⊘ ⇄ +2 = 20, Jokers = 50.${o.target ? ` Premier à <b>${o.target}</b> gagne.` : ''}</p>
   </div><div class="modal-actions"><button class="btn white" onclick="closeModal()">Compris</button></div>`);
@@ -1284,6 +1325,16 @@ function captureRects(ns){
     pre.cards[e.c] = rectOf(document.querySelector(`#hand [data-id="${e.c}"]`));
   }
   return pre;
+}
+/* Encart « tu reçois » au-dessus de la main */
+function showReceived(got, delay){
+  const box = $('#recv');
+  setTimeout(() => {
+    box.innerHTML = `<b>📥 Tu reçois ${got.length} carte${got.length > 1 ? 's' : ''}</b><div class="rc">${sortHand(got).map(c => cardHTML(c)).join('')}</div>`;
+    box.getAnimations().forEach(a => a.cancel());
+    box.style.display = 'flex';
+    box.animate([{opacity:0, transform:'translate(-50%,20px) scale(.8)'},{opacity:1, transform:'translate(-50%,0) scale(1.05)', offset:.1},{opacity:1, transform:'translate(-50%,0) scale(1)', offset:.18},{opacity:1, transform:'translate(-50%,0) scale(1)', offset:.85},{opacity:0, transform:'translate(-50%,-10px) scale(.95)'}], {duration:2800, easing:'ease-out'}).onfinish = () => box.style.display = 'none';
+  }, delay + 150);
 }
 function center(r){ return {x:r.x + r.w/2, y:r.y + r.h/2}; }
 
@@ -1429,8 +1480,24 @@ function runFx(ev, pre, old){
         shake(2.4); flash('#fff', .7); sfx.mega(); particles(c.x, c.y, 'rainbow', 50, 2);
       }, 420); break;
       case 'draw': {
+        if (e.p === myId && pre.got && pre.got.length){
+          // mes cartes volent face visible jusqu'à leur place dans ma main
+          const from = rectOf(deckEl), got = pre.got; pre.got = null;
+          got.forEach((c, k) => {
+            const el = document.querySelector(`#hand [data-id="${c}"]`); if (!el) return;
+            el.style.visibility = 'hidden';
+            setTimeout(() => sfx.draw(), drawDelay + k*130);
+            flyCard(cardHTML(c), from, el, {rot:0, rot0:rnd(-30,30), arc:90, dur:520, delay: drawDelay + k*130}).then(() => {
+              el.style.visibility = ''; el.animate([{transform:'translateY(-30px) scale(1.15)'},{transform:'translateY(0) scale(1)'}], {duration:300, easing:'ease-out'});
+            });
+          });
+          showReceived(got, drawDelay);
+          drawDelay += got.length*130;
+          break;
+        }
         const n = Math.min(e.n, 8), dest = seatRect(e.p);
         for (let k = 0; k < n; k++){ setTimeout(() => sfx.draw(), drawDelay + k*85); flyTo(backHTML(), deckEl, dest, {delay: drawDelay + k*85}); }
+        if (e.p !== myId && !ev.some(x => ['take','plus','caught','busted','contestFail'].includes(x.k) && x.p === e.p)) setTimeout(() => stamp(e.p, '+' + e.n, '#fff'), drawDelay + n*85);
         drawDelay += n*85;
         break;
       }
@@ -1533,7 +1600,7 @@ buildReacts();
     $('#onlineHint').textContent = 'Le mode en ligne s\'active quand le jeu est ouvert depuis le hub ChadGang.';
     $('#onlineCtrls').style.opacity = .45; $('#createBtn').disabled = true; $('#joinBtn').disabled = true;
   } else {
-    try { const me = await SDK.me(); if (me){ myName = me.name; if (!$('#pseudo').value) $('#pseudo').value = me.name; } } catch(e){}
+    try { const me = await SDK.me(); if (me){ myName = me.name; if (okUrl(me.avatar)) myAvatar = me.avatar; if (!$('#pseudo').value) $('#pseudo').value = me.name; } } catch(e){}
     let code = null; try { code = SDK.room(); } catch(e){}
     if (code){ $('#code').value = code; joinRoom(code, true); return; }
   }
