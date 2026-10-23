@@ -857,6 +857,7 @@ function render(){
   $('#roomChip').classList.toggle('hidden', mode !== 'online');
   $('#roomChip').textContent = roomCode || '';
   $('#muteBtn').textContent = SND.on ? '🔊' : '🔇';
+  $('#main').style.visibility = (!S || S.phase === 'lobby') ? 'hidden' : '';
   if (!S){
     $('#lobby').classList.remove('hidden');
     $('#lobby').innerHTML = `<div class="panel" style="text-align:center"><h2>Connexion…</h2><p>On cherche la salle ${esc(roomCode||'')} 🔎</p></div>`;
