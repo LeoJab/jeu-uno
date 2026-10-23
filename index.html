@@ -60,60 +60,130 @@ input[type=text]:focus{box-shadow:3px 3px 0 var(--ink)}
 #topbar .spacer{flex:1}
 #topbar .icon{width:36px;height:36px;font-size:17px}
 
-/* ---------- adversaires ---------- */
-#opps{display:flex;flex-wrap:wrap;justify-content:center;gap:8px;padding:4px 10px;flex:none}
-.seat{position:relative;display:flex;align-items:center;gap:7px;background:#fff;border:3px solid var(--ink);border-radius:14px;box-shadow:3px 3px 0 var(--ink);padding:5px 9px 5px 5px;min-width:0;max-width:200px;transition:background .2s}
-.seat.turn{background:var(--yellow);animation:bob 1s ease-in-out infinite}
-.seat.away{opacity:.6}
-@keyframes bob{50%{transform:translateY(-3px)}}
-.av{width:32px;height:32px;flex:none;border-radius:50%;border:3px solid var(--ink);display:grid;place-items:center;color:#fff;font-weight:900;font-size:15px;text-shadow:1px 1px 0 var(--ink)}
-.seat .nm{font-weight:900;font-size:13px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;max-width:92px;line-height:1.1}
-.seat .sub{font-size:11px;opacity:.7;line-height:1.1;white-space:nowrap}
-.seat .cnt{font-family:var(--display);font-size:22px;line-height:1;min-width:22px;text-align:center}
-.minis{display:flex;height:22px;align-items:flex-end}
-.mini{width:13px;height:20px;border-radius:3px;border:2px solid var(--ink);background:repeating-linear-gradient(45deg,var(--ink) 0 3px,#3a3580 3px 6px);margin-left:-7px}
-.mini:first-child{margin-left:0}
-.badge-uno{position:absolute;top:-12px;right:-8px;background:var(--r);color:#fff;font-family:var(--display);font-size:14px;padding:1px 8px;border-radius:999px;border:3px solid var(--ink);transform:rotate(8deg);animation:pulse .8s ease-in-out infinite}
-@keyframes pulse{50%{transform:rotate(8deg) scale(1.15)}}
-.catch{position:absolute;bottom:-14px;left:50%;transform:translateX(-50%);background:var(--r);color:#fff;border:3px solid var(--ink);border-radius:999px;padding:2px 10px;font-weight:900;font-size:12px;box-shadow:2px 2px 0 var(--ink);white-space:nowrap;z-index:5;animation:wob .35s ease-in-out infinite}
-@keyframes wob{0%,100%{transform:translateX(-50%) rotate(-4deg)}50%{transform:translateX(-50%) rotate(4deg)}}
+#main{flex:1;min-height:0;display:flex}
+#arena{flex:1;min-width:0;display:flex;flex-direction:column;position:relative}
 
 /* ---------- table ---------- */
-#table{position:relative;flex:1;min-height:150px;display:grid;place-items:center}
-#felt{position:relative;width:min(92vw,440px,46dvh);aspect-ratio:1;border-radius:50%;display:grid;place-items:center;
-  background:radial-gradient(circle,#2f3ff7 0%,#1c27c4 70%,#141da0 100%);border:4px solid var(--ink);
-  box-shadow:0 0 0 7px var(--cur),0 0 60px 10px color-mix(in srgb,var(--cur) 55%,transparent),inset 0 0 40px rgba(0,0,0,.35);transition:box-shadow .5s}
-#dir{position:absolute;inset:7%;border-radius:50%;border:4px dashed rgba(255,255,255,.28);animation:spin 14s linear infinite}
+#table{position:relative;flex:1;min-height:200px}
+#felt{position:absolute;border-radius:50%;display:grid;place-items:center;
+  background:radial-gradient(ellipse at 50% 40%,#3a4aff 0%,#1d28c6 62%,#121a96 100%);border:5px solid var(--ink);
+  box-shadow:0 0 0 8px var(--cur),0 0 0 13px var(--ink),0 0 70px 16px color-mix(in srgb,var(--cur) 50%,transparent),inset 0 0 50px rgba(0,0,0,.4);transition:box-shadow .5s}
+#spotWrap{position:absolute;inset:0;border-radius:50%;overflow:hidden;pointer-events:none}
+#spot{position:absolute;left:50%;top:50%;width:220%;aspect-ratio:1;translate:-50% -50%;
+  background:conic-gradient(from -26deg,rgba(255,212,38,.55),rgba(255,212,38,.15) 52deg,transparent 52deg);transition:rotate .6s cubic-bezier(.3,.7,.3,1),opacity .3s}
+#dir{position:absolute;inset:9%;border-radius:50%;border:4px dashed rgba(255,255,255,.22);animation:spin 16s linear infinite;pointer-events:none}
 #dir.ccw{animation-direction:reverse}
-#dir::before,#dir::after{content:'➤';position:absolute;color:rgba(255,255,255,.55);font-size:22px}
-#dir::before{top:-15px;left:50%;transform:translateX(-50%)}
-#dir::after{bottom:-15px;left:50%;transform:translateX(-50%) rotate(180deg)}
+#dir::before,#dir::after{content:'➤';position:absolute;color:rgba(255,255,255,.5);font-size:20px}
+#dir::before{top:-14px;left:50%;transform:translateX(-50%)}
+#dir::after{bottom:-14px;left:50%;transform:translateX(-50%) rotate(180deg)}
 #dir.ccw::before{transform:translateX(-50%) rotate(180deg)}#dir.ccw::after{transform:translateX(-50%)}
 @keyframes spin{to{transform:rotate(360deg)}}
-#center{position:relative;display:flex;gap:clamp(16px,6vw,36px);align-items:center;z-index:2}
+#center{position:relative;display:flex;flex-direction:column;align-items:center;gap:12px;z-index:2}
+#piles{display:flex;gap:clamp(14px,5vw,34px);align-items:center}
 #deck,#pile{position:relative;width:var(--pw);height:calc(var(--pw)*1.46)}
 #deck .card,#pile .card{position:absolute;inset:0;--cw:var(--pw)}
 #deck{cursor:pointer}
 #deck .card:nth-child(1){transform:translate(6px,6px)}#deck .card:nth-child(2){transform:translate(3px,3px)}
-#deck.can .card:last-child{animation:glow 1s ease-in-out infinite}
+#deck.can .card:last-of-type{animation:glow 1s ease-in-out infinite}
 @keyframes glow{50%{box-shadow:3px 3px 0 var(--ink),0 0 0 5px var(--yellow),0 0 28px 6px var(--yellow)}}
-#deck .count{position:absolute;bottom:-12px;left:50%;transform:translateX(-50%);background:#fff;border:3px solid var(--ink);border-radius:999px;font-size:12px;font-weight:900;padding:0 8px;z-index:3;white-space:nowrap}
-#curcol{position:absolute;top:-16px;right:-16px;width:34px;height:34px;border-radius:50%;border:3px solid var(--ink);background:var(--cur);z-index:4;box-shadow:2px 2px 0 var(--ink);transition:background .4s}
+#deck .count{position:absolute;bottom:-11px;left:50%;transform:translateX(-50%);background:#fff;border:3px solid var(--ink);border-radius:999px;font-size:11px;font-weight:900;padding:0 7px;z-index:3;white-space:nowrap}
 #stackBadge{position:absolute;left:50%;top:-4px;transform:translate(-50%,-100%);z-index:6;font-family:var(--display);font-size:clamp(28px,9vw,46px);color:#fff;-webkit-text-stroke:3px var(--ink);paint-order:stroke fill;text-shadow:3px 3px 0 var(--ink);white-space:nowrap;animation:fire .5s ease-in-out infinite alternate;pointer-events:none}
 @keyframes fire{from{transform:translate(-50%,-100%) scale(1) rotate(-3deg);filter:drop-shadow(0 0 8px #ff7b00)}to{transform:translate(-50%,-104%) scale(1.08) rotate(3deg);filter:drop-shadow(0 0 18px #ff3b00)}}
+#tinfo{display:flex;gap:6px;flex-wrap:wrap;justify-content:center}
+.tchip{background:rgba(18,16,43,.8);color:#fff;border:2px solid var(--ink);border-radius:999px;padding:2px 9px;font-size:12px;font-weight:900;white-space:nowrap;display:inline-flex;align-items:center;gap:5px}
+.tchip .dot{width:13px;height:13px;border-radius:50%;border:2px solid #fff;background:var(--cur);transition:background .4s}
+.tchip.hot{background:var(--r)}
 
-/* ---------- statut / actions ---------- */
-#status{text-align:center;color:#fff;font-weight:900;font-size:clamp(15px,4vw,19px);text-shadow:2px 2px 0 var(--ink);padding:2px 12px;min-height:26px;flex:none}
-#status.me{color:var(--yellow);animation:popin .35s}
+/* ---------- sièges autour de la table ---------- */
+.av{width:32px;height:32px;flex:none;border-radius:50%;border:3px solid var(--ink);display:grid;place-items:center;color:#fff;font-weight:900;font-size:15px;text-shadow:1px 1px 0 var(--ink);line-height:1}
+#seats{position:absolute;inset:0;pointer-events:none}
+.seat{position:absolute;translate:-50% -50%;pointer-events:auto;display:flex;align-items:center;gap:9px;background:#fff;border:3px solid var(--ink);border-radius:16px;box-shadow:4px 4px 0 var(--ink);padding:6px 11px 6px 6px;transition:left .4s,top .4s,background .25s,scale .25s,box-shadow .25s;z-index:3;width:max-content;max-width:190px}
+.seat.turn{background:var(--yellow);scale:1.12;z-index:6;box-shadow:4px 4px 0 var(--ink),0 0 0 4px #fff,0 0 34px 10px rgba(255,212,38,.85)}
+.seat.me{background:#e6e9ff}
+.seat.me.turn{background:var(--yellow)}
+.seat.away{opacity:.55;filter:grayscale(.7)}
+.avw{position:relative;flex:none}
+.seat .av{width:40px;height:40px;font-size:18px}
+.seat.turn .av{animation:spinav 2.4s ease-in-out infinite}
+@keyframes spinav{0%,70%,100%{rotate:0deg}80%{rotate:-12deg}90%{rotate:12deg}}
+.cntb{position:absolute;right:-10px;bottom:-8px;min-width:25px;height:25px;padding:0 5px;border-radius:999px;background:var(--ink);color:#fff;border:2px solid #fff;font-family:var(--display);font-size:15px;display:grid;place-items:center;line-height:1;box-shadow:1px 1px 0 var(--ink)}
+.seat.danger .cntb{background:var(--r);animation:pulse3 .7s ease-in-out infinite}
+@keyframes pulse3{50%{scale:1.25}}
+.seat .info{min-width:0}
+.seat .nm{font-weight:900;font-size:14px;line-height:1.15;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;max-width:110px}
+.seat .sub{font-size:11.5px;line-height:1.25;opacity:.75;white-space:nowrap;font-weight:800}
+.minis{display:flex;height:18px;align-items:flex-end;margin-top:3px}
+.mini{width:11px;height:16px;border-radius:3px;border:2px solid var(--ink);background:repeating-linear-gradient(45deg,var(--ink) 0 3px,#3a3580 3px 6px);margin-left:-5px}
+.mini:first-child{margin-left:0}
+.minis b{font-size:11px;margin-left:3px;line-height:16px}
+.tag-turn{position:absolute;left:50%;top:-10px;translate:-50% -100%;background:var(--ink);color:var(--yellow);font-weight:900;font-size:11px;padding:2px 9px;border-radius:999px;white-space:nowrap;animation:bob .8s ease-in-out infinite;letter-spacing:.5px}
+.tag-turn::after{content:'';position:absolute;left:50%;bottom:-6px;translate:-50% 0;border:6px solid transparent;border-top-color:var(--ink);border-bottom:0}
+@keyframes bob{50%{transform:translateY(-4px)}}
+.tbar{position:absolute;left:10px;right:10px;bottom:-4px;height:6px;border-radius:9px;background:#fff;border:2px solid var(--ink);overflow:hidden}
+.tbar i{display:block;height:100%;background:var(--r);animation:tdown linear forwards}
+@keyframes tdown{from{width:100%}to{width:0}}
+.badge-uno{position:absolute;top:-12px;right:-10px;background:var(--r);color:#fff;font-family:var(--display);font-size:14px;padding:1px 8px;border-radius:999px;border:3px solid var(--ink);transform:rotate(8deg);animation:pulse .8s ease-in-out infinite;z-index:2}
+@keyframes pulse{50%{transform:rotate(8deg) scale(1.15)}}
+.catch{position:absolute;bottom:-16px;left:50%;transform:translateX(-50%);background:var(--r);color:#fff;border:3px solid var(--ink);border-radius:999px;padding:2px 10px;font-weight:900;font-size:12px;box-shadow:2px 2px 0 var(--ink);white-space:nowrap;z-index:7;animation:wob .35s ease-in-out infinite}
+@keyframes wob{0%,100%{transform:translateX(-50%) rotate(-4deg)}50%{transform:translateX(-50%) rotate(4deg)}}
+.bubble{position:absolute;left:50%;top:-6px;translate:-50% -100%;background:#fff;border:3px solid var(--ink);border-radius:14px;padding:1px 8px;font-size:26px;line-height:1.2;box-shadow:2px 2px 0 var(--ink);z-index:9;animation:bubble 2.3s ease forwards;pointer-events:none}
+@keyframes bubble{0%{scale:.2;opacity:0}12%{scale:1.2;opacity:1}22%{scale:1}80%{opacity:1}100%{opacity:0;translate:-50% -150%}}
+
+/* ---------- statut / actions / réactions ---------- */
+#status{flex:none;display:flex;justify-content:center;padding:6px 10px 0;min-height:44px}
+#status .pill{display:inline-flex;align-items:center;gap:8px;background:#fff;border:3px solid var(--ink);border-radius:999px;box-shadow:3px 3px 0 var(--ink);padding:3px 16px 3px 3px;font-weight:900;font-size:clamp(14px,3.8vw,17px);max-width:100%;min-width:0}
+#status .pill span{white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+#status .pill .av{width:30px;height:30px;font-size:14px;border-width:2px}
+#status .pill.me{background:var(--yellow);animation:popin .35s,pulse4 1.4s ease-in-out .35s infinite}
+#status .pill.alert{background:var(--r);color:#fff}
+@keyframes pulse4{50%{box-shadow:3px 3px 0 var(--ink),0 0 0 5px rgba(255,255,255,.7)}}
 @keyframes popin{from{transform:scale(.7)}to{transform:scale(1)}}
-#actions{display:flex;gap:8px;justify-content:center;flex-wrap:wrap;padding:4px 10px 6px;min-height:52px;flex:none;align-items:center}
+#actions{display:flex;gap:8px;justify-content:center;flex-wrap:wrap;padding:6px 10px 2px;min-height:50px;flex:none;align-items:center}
 #unoBtn{font-family:var(--display);font-size:22px;background:var(--r);color:#fff;-webkit-text-stroke:1px var(--ink);letter-spacing:1px;padding:6px 18px}
 #unoBtn.armed{background:var(--yellow);color:var(--ink);animation:pulse2 .6s ease-in-out infinite}
 #unoBtn.urgent{animation:pulse2 .3s ease-in-out infinite}
 @keyframes pulse2{50%{transform:scale(1.1) rotate(-3deg)}}
+#reacts{flex:none;display:flex;justify-content:center;gap:6px;padding:2px 10px;overflow-x:auto;scrollbar-width:none}
+#reacts button{width:38px;height:38px;flex:none;border:3px solid var(--ink);border-radius:12px;background:#fff;box-shadow:2px 2px 0 var(--ink);font-size:20px;padding:0;transition:transform .1s;line-height:1}
+#reacts button:hover{transform:translateY(-3px) scale(1.12) rotate(-6deg)}
+#reacts button:active{transform:scale(.88)}
+#reacts.cool button{opacity:.5}
+
+/* ---------- panneau de droite ---------- */
+#side{width:300px;flex:none;display:flex;flex-direction:column;gap:12px;padding:6px 12px 12px 0;min-height:0}
+.sbox{background:#fff;border:3px solid var(--ink);border-radius:18px;box-shadow:5px 5px 0 var(--ink);padding:12px;min-height:0}
+.sbox.grow{flex:1;display:flex;flex-direction:column}
+.sbox h3{margin:0 0 8px;font-family:var(--display);font-weight:400;font-size:20px;display:flex;justify-content:space-between;align-items:baseline;gap:8px}
+.sbox h3 small{font-family:'Nunito',sans-serif;font-weight:800;font-size:12px;opacity:.6}
+#hist{list-style:none;margin:0;padding:0 4px 0 0;overflow-y:auto;flex:1;font-size:13px;min-height:80px}
+#hist li{display:flex;gap:8px;align-items:flex-start;padding:6px 2px;border-bottom:2px dashed rgba(18,16,43,.1);line-height:1.3}
+#hist li .d{flex:none;width:13px;height:13px;border-radius:4px;border:2px solid var(--ink);margin-top:2px;background:#e4e4ee}
+#hist li.new{animation:slidein .4s}
+#hist li:first-child{font-weight:900}
+@keyframes slidein{from{opacity:0;transform:translateX(24px);background:#fff3b0}}
+.rrow{position:relative;display:flex;align-items:center;gap:8px;padding:6px 6px 8px;border-radius:12px;overflow:hidden}
+.rrow + .rrow{margin-top:2px}
+.rrow.cur{background:#fff3b0}
+.rrow .rk{font-family:var(--display);width:24px;text-align:center;font-size:18px;flex:none}
+.rrow .av{width:30px;height:30px;font-size:13px;border-width:2px}
+.rrow .rn{flex:1;min-width:0;font-weight:900;font-size:14px;line-height:1.15;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.rrow .rn small{display:block;font-size:11.5px;opacity:.7;font-weight:800}
+.rrow .rn small.hot{color:var(--r);opacity:1}
+.rrow .rp{font-family:var(--display);font-size:21px;flex:none}
+.rrow .prog{position:absolute;left:6px;right:6px;bottom:2px;height:4px;border-radius:4px;background:rgba(18,16,43,.1)}
+.rrow .prog i{display:block;height:100%;border-radius:4px;background:var(--g);transition:width .6s}
+#sideClose{display:none}
+#sideBack{display:none}
+@media (max-width:899px){
+  #side{position:fixed;top:0;right:0;bottom:0;width:min(330px,88vw);padding:12px;background:var(--blue);border-left:4px solid var(--ink);z-index:85;transform:translateX(105%);transition:transform .3s}
+  #side.open{transform:none}
+  #sideClose{display:block;align-self:flex-end}
+  #sideBack.open{display:block;position:fixed;inset:0;background:rgba(18,16,43,.45);z-index:84}
+}
+@media (min-width:900px){ #sideBtn{display:none} }
 
 /* ---------- main ---------- */
-#handWrap{flex:none;padding:26px 10px calc(10px + env(safe-area-inset-bottom));overflow-x:auto;overflow-y:visible;scrollbar-width:thin}
+#handWrap{flex:none;padding:24px 10px calc(10px + env(safe-area-inset-bottom));overflow-x:auto;overflow-y:visible;scrollbar-width:thin}
 #hand{display:flex;justify-content:center;min-width:min-content;padding:0 8px;height:calc(var(--cw)*1.46 + 6px)}
 #hand .card{cursor:pointer;transition:transform .15s,filter .2s,margin .2s}
 #hand.myturn .card.ok{transform:translateY(-14px)}
@@ -142,7 +212,7 @@ input[type=text]:focus{box-shadow:3px 3px 0 var(--ink)}
 .card.back .mid span{color:var(--blue);font-size:calc(var(--cw)*.27);-webkit-text-stroke:calc(var(--cw)*.02) var(--ink)}
 
 /* ---------- lobby ---------- */
-#lobby{position:absolute;inset:52px 0 0;overflow-y:auto;padding:10px 16px 30px;z-index:20;display:flex;justify-content:center;align-items:flex-start}
+#lobby{position:absolute;inset:52px 0 0;background:var(--blue);overflow-y:auto;padding:10px 16px 30px;z-index:20;display:flex;justify-content:center;align-items:flex-start}
 #lobby .panel{width:100%;max-width:520px}
 #lobby h2{font-family:var(--display);font-weight:400;font-size:26px;margin:0 0 4px}
 .bigcode{font-family:var(--display);font-size:46px;letter-spacing:6px;background:var(--yellow);border:3px solid var(--ink);border-radius:14px;box-shadow:4px 4px 0 var(--ink);display:inline-block;padding:2px 16px;margin:6px 0 12px;cursor:pointer}
@@ -201,12 +271,9 @@ input[type=text]:focus{box-shadow:3px 3px 0 var(--ink)}
 #confetti{position:fixed;inset:0;pointer-events:none;z-index:75;width:100%;height:100%}
 #toast{position:fixed;left:50%;bottom:calc(var(--cw)*1.46 + 70px);transform:translateX(-50%);background:var(--ink);color:#fff;padding:8px 16px;border-radius:999px;font-weight:900;font-size:14px;z-index:90;opacity:0;transition:opacity .2s;pointer-events:none;white-space:nowrap;max-width:92vw;overflow:hidden;text-overflow:ellipsis}
 #toast.on{opacity:1}
-#emoBar{position:absolute;right:10px;bottom:calc(var(--cw)*1.46 + 82px);display:flex;flex-direction:column;gap:6px;z-index:25}
-#emoBar .icon{width:38px;height:38px;font-size:19px}
-#emoBar.closed .e{display:none}
 
-@media (max-height:640px){:root{--cw:clamp(48px,12vw,70px);--pw:clamp(54px,13vw,80px)}#felt{width:min(80vw,40dvh)}}
-@media (max-width:420px){.seat{padding:3px 7px 3px 3px;gap:5px}.seat .nm{max-width:62px;font-size:12px}.av{width:26px;height:26px;font-size:12px}.seat .cnt{font-size:19px}.minis{display:none}}
+@media (max-height:700px){:root{--cw:clamp(48px,12vw,72px)}#reacts button{width:32px;height:32px;font-size:17px}}
+@media (max-width:560px){.seat{flex-direction:column;gap:3px;padding:5px 6px 4px;text-align:center;max-width:94px;border-radius:14px}.seat .av{width:34px;height:34px;font-size:15px}.seat .nm{max-width:82px;font-size:12px}.seat .sub{font-size:10.5px}.minis{display:none}.cntb{min-width:22px;height:22px;font-size:13px}}
 @media (prefers-reduced-motion:reduce){*{animation-duration:.01ms!important}}
 </style>
 </head>
@@ -248,26 +315,36 @@ input[type=text]:focus{box-shadow:3px 3px 0 var(--ink)}
     <span class="chip code hidden" id="roomChip" title="Copier le code"></span>
     <span class="chip" id="roundChip"></span>
     <span class="spacer"></span>
-    <button class="icon" id="scoreBtn" title="Classement">🏆</button>
-    <button class="icon" id="logBtn" title="Historique">📜</button>
+    <button class="icon" id="sideBtn" title="Classement et historique">📊</button>
     <button class="icon" id="rulesBtn" title="Règles">❓</button>
     <button class="icon" id="muteBtn" title="Son">🔊</button>
     <button class="icon" id="quitBtn" title="Quitter">🚪</button>
   </header>
-  <div id="opps"></div>
-  <div id="table">
-    <div id="felt">
-      <div id="dir"></div>
-      <div id="center">
-        <div id="deck" title="Piocher"></div>
-        <div id="pile"><div id="curcol"></div></div>
+  <div id="main">
+    <div id="arena">
+      <div id="table">
+        <div id="felt">
+          <div id="spotWrap"><div id="spot"></div></div>
+          <div id="dir"></div>
+          <div id="center">
+            <div id="piles"><div id="deck" title="Piocher"></div><div id="pile"></div></div>
+            <div id="tinfo"></div>
+          </div>
+        </div>
+        <div id="seats"></div>
       </div>
+      <div id="status"></div>
+      <div id="actions"></div>
+      <div id="reacts"></div>
+      <div id="handWrap"><div id="hand"></div></div>
     </div>
+    <aside id="side">
+      <button class="icon" id="sideClose" title="Fermer">✖</button>
+      <div class="sbox"><h3>🏆 Classement <small id="rankSub"></small></h3><div id="rank"></div></div>
+      <div class="sbox grow"><h3>📜 Historique <small id="histSub"></small></h3><ul id="hist"></ul></div>
+    </aside>
   </div>
-  <div id="status"></div>
-  <div id="actions"></div>
-  <div id="handWrap"><div id="hand"></div></div>
-  <div id="emoBar" class="closed hidden"></div>
+  <div id="sideBack"></div>
   <div id="lobby" class="hidden"></div>
 </section>
 
@@ -333,7 +410,7 @@ const seatOf = (S,id) => S.players.findIndex(p => p.id === id);
 const topCard = S => CARDS[S.disc[S.disc.length-1]];
 const nextIdx = (S, from, k=1) => { const n = S.players.length; return (((from + S.dir*k) % n) + n) % n; };
 const nameOf = (S,id) => { const p = S.players.find(p=>p.id===id); return p ? p.name : '???'; };
-function log(S, txt){ S.log.push(txt); if (S.log.length > 30) S.log.splice(0, S.log.length - 30); }
+function log(S, txt, col){ S.log.push(col ? [txt, col] : txt); if (S.log.length > 30) S.log.splice(0, S.log.length - 30); }
 
 function canPlay(S, cid){
   if (S.chal) return false;
@@ -427,7 +504,7 @@ function doAct(S, pid, a){
       S.disc.push(cid); S.color = card.c === 'k' ? a.col : card.c; S.drawn = null;
       if (a.uno && hand.length === 1) S.said[pid] = true;
       S.ev.push({k:'play', p:pid, c:cid, col:S.color});
-      log(S, `${me.name} pose ${cardName(cid)}${card.c==='k' ? ' → '+CNAME[S.color] : ''}`);
+      log(S, `${me.name} pose ${cardName(cid)}${card.c==='k' ? ' → '+CNAME[S.color] : ''}`, card.c === 'k' ? 'k' + S.color : S.color);
       if (hand.length === 1){
         if (S.said[pid]){ S.ev.push({k:'uno', p:pid}); log(S, `📣 ${me.name} : « UNO ! »`); }
         else S.vuln = pid;
@@ -588,6 +665,7 @@ function commit(ns){
     if (ns.phase === 'play' || ns.phase === 'roundEnd') lsSet('uno-solo', ns); else lsDel('uno-solo');
   }
   receive(ns, false);
+  if (isHost()) botReact(ns);
 }
 
 /* Le joueur local fait une action */
@@ -736,7 +814,11 @@ function joinRoom(code, create){
     if (!d || typeof d !== 'object') return;
     if (d.t === 'state') receive(d.s, false);
     else if (d.t === 'act'){ if (isHost() && from && from.id !== myId) hostHandle(from.id, d.a, d.v); }
-    else if (d.t === 'emo'){ showEmote(from && from.id, d.e); }
+    else if (d.t === 'emo'){
+      let pid = from && from.id;
+      if (d.p){ if (!presence[0] || !from || from.id !== presence[0].id || !S || !S.players.some(p => p.id === d.p && p.bot)) return; pid = d.p; }
+      showEmote(pid, d.e);
+    }
   });
   room.on('error', msg => { toast('😬 ' + (msg || 'Erreur de salle')); setTimeout(goHome, 1600); });
 }
@@ -775,7 +857,6 @@ function render(){
   if (!mode) return;
   $('#roomChip').classList.toggle('hidden', mode !== 'online');
   $('#roomChip').textContent = roomCode || '';
-  $('#emoBar').classList.toggle('hidden', mode !== 'online' || !S || S.phase === 'lobby');
   $('#muteBtn').textContent = SND.on ? '🔊' : '🔇';
   if (!S){
     $('#lobby').classList.remove('hidden');
@@ -784,14 +865,14 @@ function render(){
   }
   if (S.phase === 'lobby'){ renderLobby(); return; }
   $('#lobby').classList.add('hidden');
-  $('#roundChip').textContent = `Manche ${S.round}` + (S.opts.stack ? ' · cumul +2 🔥' : '');
-  renderOpps(); renderTable(); renderHand(); renderActions();
+  $('#roundChip').textContent = `Manche ${S.round}` + (S.opts.target ? ` · ${S.opts.target} pts` : ' · 1 manche');
+  renderSeats(); renderTable(); renderHand(); renderActions(); renderSide();
 }
 
 function renderLobby(){
   const lb = $('#lobby'); lb.classList.remove('hidden');
   $('#roundChip').textContent = 'Lobby';
-  $('#opps').innerHTML = ''; $('#hand').innerHTML = ''; $('#actions').innerHTML = ''; $('#status').textContent = '';
+  $('#seats').innerHTML = ''; $('#hand').innerHTML = ''; $('#actions').innerHTML = ''; $('#status').textContent = '';
   const host = isHost(), o = S.opts;
   const sw = (k, title, desc) => `<div class="opt"><div class="txt"><b>${title}</b><small>${desc}</small></div><div class="switch ${o[k]?'on':''} ${host?'':'dis'}" data-opt="${k}"></div></div>`;
   const seg = (k, title, desc, choices) => `<div class="opt" style="flex-wrap:wrap"><div class="txt"><b>${title}</b><small>${desc}</small></div><div class="seg ${host?'':'dis'}">${choices.map(([v,l]) => `<button data-seg="${k}" data-val="${v}" class="${o[k]===v?'on':''}">${l}</button>`).join('')}</div></div>`;
@@ -829,24 +910,103 @@ function renderLobby(){
   };
 }
 
-function renderOpps(){
-  const box = $('#opps');
-  box.innerHTML = orderedOpps().map(p => {
+/* Place les joueurs autour de la table (moi en bas, les autres dans le sens horaire) */
+let G = null, spotAngle = null;
+function layoutTable(){
+  const t = $('#table'), W = t.clientWidth, H = t.clientHeight;
+  const small = W < 560, sw = small ? 90 : 170, sh = small ? 84 : 64;
+  let fw = Math.min(W - sw * 1.05, 700), fh = Math.min(H - sh * 1.45, W < H ? fw * 1.45 : fw * .66);
+  fw = Math.max(fw, 170); fh = Math.max(fh, 130);
+  if (fw > fh * 1.9) fw = fh * 1.9;
+  const cx = W / 2, cy = H / 2;
+  const f = $('#felt');
+  Object.assign(f.style, {left:(cx - fw/2)+'px', top:(cy - fh/2)+'px', width:fw+'px', height:fh+'px'});
+  const pw = Math.max(48, Math.min(112, fh * .36, fw * .21));
+  f.style.setProperty('--pw', pw + 'px');
+  G = {W, H, cx, cy, rx: fw/2 + sw*.1, ry: fh/2 + sh*.2, sw, sh};
+  return G;
+}
+function seatAngles(){
+  const n = S.players.length, mi = seatOf(S, myId);
+  if (mi < 0) return S.players.map((p, k) => ({p, a: 90 + k * 360 / n}));
+  const out = [{p: S.players[mi], a: 90}];
+  for (let k = 1; k < n; k++) out.push({p: S.players[(mi + k) % n], a: 150 + k * 240 / n});
+  return out;
+}
+function renderSeats(){
+  const g = layoutTable(), box = $('#seats');
+  const curId = S.phase === 'play' && S.players[S.turn] ? S.players[S.turn].id : null;
+  const hostId = mode === 'online' && presence[0] ? presence[0].id : null;
+  let curPos = null;
+  box.innerHTML = seatAngles().map(({p, a}) => {
+    const rad = a * Math.PI / 180;
+    let x = g.cx + g.rx * Math.cos(rad), y = g.cy + g.ry * Math.sin(rad);
+    x = Math.max(g.sw/2 + 4, Math.min(g.W - g.sw/2 - 4, x));
+    y = Math.max(g.sh/2 + 26, Math.min(g.H - g.sh/2 - 6, y));
     const n = (S.hands[p.id]||[]).length;
-    const isTurn = S.phase === 'play' && S.players[S.turn] && S.players[S.turn].id === p.id;
+    const isTurn = p.id === curId, isMe = p.id === myId;
+    if (isTurn) curPos = {x, y};
     const away = !p.bot && !present(p.id);
     const showUno = n === 1 && S.said[p.id];
-    const canCatch = S.phase === 'play' && S.vuln === p.id && seatOf(S, myId) >= 0;
-    return `<div class="seat ${isTurn?'turn':''} ${away?'away':''}" data-pid="${esc(p.id)}">
-      ${avHTML(p)}
-      <div style="min-width:0"><div class="nm">${esc(p.name)}</div><div class="sub">${away ? '💤 absent' : (S.scores[p.id]||0) + ' pts'}</div></div>
-      <div class="minis">${'<span class="mini"></span>'.repeat(Math.min(n, 6))}</div>
-      <div class="cnt">${n}</div>
+    const canCatch = S.phase === 'play' && S.vuln === p.id && !isMe && seatOf(S, myId) >= 0;
+    const tags = [p.bot ? '🤖 bot' : '', p.id === hostId ? '👑' : '', away ? '💤 absent' : ''].filter(Boolean).join(' ');
+    let timer = '';
+    if (isTurn && mode === 'online' && !p.bot && !away){
+      const el = Math.max(0, Date.now() - (S.turnAt || Date.now()));
+      timer = `<div class="tbar"><i style="animation-duration:60000ms;animation-delay:-${Math.min(el, 59000)}ms"></i></div>`;
+    }
+    const turnTxt = isMe ? 'À TOI !' : (S.chal && S.chal.to === seatOf(S, p.id) ? 'RÉPOND AU +4' : 'SON TOUR');
+    return `<div class="seat ${isTurn?'turn':''} ${isMe?'me':''} ${away?'away':''} ${n>0 && n<=2 && S.phase==='play'?'danger':''}" data-pid="${esc(p.id)}" style="left:${x.toFixed(1)}px;top:${y.toFixed(1)}px">
+      ${isTurn ? `<div class="tag-turn">▼ ${turnTxt}</div>` : ''}
+      <div class="avw">${avHTML(p)}<span class="cntb" title="${n} cartes">${n}</span></div>
+      <div class="info">
+        <div class="nm">${esc(isMe ? (p.name === 'Toi' ? 'Toi' : p.name + ' (toi)') : p.name)}</div>
+        <div class="sub">${S.scores[p.id]||0} pts${tags ? ' · ' + tags : ''}</div>
+        <div class="minis">${'<span class="mini"></span>'.repeat(Math.min(n, 8))}${n > 8 ? `<b>+${n-8}</b>` : ''}</div>
+      </div>
       ${showUno ? '<span class="badge-uno">UNO</span>' : ''}
       ${canCatch ? `<button class="catch" data-catch="${esc(p.id)}">🫵 Contre-Uno !</button>` : ''}
+      ${timer}
     </div>`;
   }).join('');
   box.querySelectorAll('[data-catch]').forEach(b => b.onclick = () => { initAudio(); sendAct({t:'catch', p:b.dataset.catch}); });
+  // projecteur vers le joueur dont c'est le tour
+  const spot = $('#spot');
+  if (curPos){
+    let a = Math.atan2(curPos.y - g.cy, curPos.x - g.cx) * 180 / Math.PI + 90;
+    if (spotAngle != null){ while (a - spotAngle > 180) a -= 360; while (a - spotAngle < -180) a += 360; }
+    spotAngle = a; spot.style.rotate = a + 'deg'; spot.style.opacity = 1;
+  } else spot.style.opacity = 0;
+}
+
+function renderSide(){
+  const ids = S.players.map(p => p.id);
+  const curId = S.phase === 'play' && S.players[S.turn] ? S.players[S.turn].id : null;
+  const sorted = ids.slice().sort((a,b) => (S.scores[b]||0) - (S.scores[a]||0) || (S.hands[a]||[]).length - (S.hands[b]||[]).length);
+  const tgt = S.opts.target || 0;
+  $('#rankSub').textContent = tgt ? `premier à ${tgt}` : 'manche unique';
+  $('#rank').innerHTML = sorted.map((id, k) => {
+    const p = S.players.find(x => x.id === id), n = (S.hands[id]||[]).length, sc = S.scores[id]||0;
+    const hot = S.phase === 'play' && n <= 2;
+    return `<div class="rrow ${id===curId?'cur':''}">
+      <span class="rk">${['🥇','🥈','🥉'][k] || (k+1)}</span>${avHTML(p)}
+      <span class="rn">${esc(p.name)}${id===myId && p.name !== 'Toi' ?' (toi)':''}<small class="${hot?'hot':''}">${S.phase==='play' ? `🃏 ${n} carte${n>1?'s':''}${n===1?' · UNO !':''}` : ''}${id===curId ? ' · ▶ joue' : ''}</small></span>
+      <span class="rp">${sc}</span>
+      ${tgt ? `<span class="prog"><i style="width:${Math.min(100, sc/tgt*100).toFixed(1)}%"></i></span>` : ''}
+    </div>`;
+  }).join('');
+  const L = (S.log||[]).slice().reverse();
+  $('#histSub').textContent = `manche ${S.round||1}`;
+  const hist = $('#hist'), prevTop = hist.dataset.top || '';
+  const txt = l => Array.isArray(l) ? l[0] : l;
+  let fresh = L.findIndex(l => txt(l) === prevTop); if (fresh < 0) fresh = prevTop ? Math.min(3, L.length) : 0;
+  hist.innerHTML = L.map((l, k) => {
+    const t = txt(l), c = Array.isArray(l) ? l[1] : null;
+    let bg = '';
+    if (c){ bg = c.length === 2 ? `background:conic-gradient(${CHEX.r} 0 25%,${CHEX.y} 0 50%,${CHEX.g} 0 75%,${CHEX.b} 0);box-shadow:inset 0 0 0 3px ${CHEX[c[1]]}` : `background:${CHEX[c]}`; }
+    return `<li class="${k < fresh ? 'new' : ''}"><span class="d" style="${bg}"></span><span>${esc(t)}</span></li>`;
+  }).join('') || '<li>La partie commence…</li>';
+  hist.dataset.top = L.length ? txt(L[0]) : '';
 }
 
 function renderTable(){
@@ -860,29 +1020,32 @@ function renderTable(){
   deck.innerHTML = backHTML() + backHTML() + backHTML() + `<span class="count">${S.deck.length} cartes</span>`;
   const pile = $('#pile');
   const last = S.disc.slice(-3);
-  pile.innerHTML = '<div id="curcol"></div>' + last.map((c, k) => {
+  pile.innerHTML = last.map((c, k) => {
     const rot = ((c * 37) % 25) - 12, dx = ((c * 13) % 9) - 4;
     return cardHTML(c, k === last.length-1 ? 'top' : '').replace('class="card', `style="transform:translate(${dx}px,0) rotate(${rot}deg)" class="card`);
   }).join('') + (S.stack > 0 ? `<div id="stackBadge">+${S.stack} 🔥</div>` : '');
+  $('#tinfo').innerHTML = `<span class="tchip"><span class="dot"></span>${CNAME[S.color]}</span><span class="tchip">${S.dir > 0 ? '↻ horaire' : '↺ anti-horaire'}</span>${S.stack > 0 ? `<span class="tchip hot">🔥 cumul +${S.stack}</span>` : ''}`;
   // statut
   const st = $('#status');
-  let txt = '', mine = false;
+  let txt = '', mine = false, who = null, alert = false;
   if (S.phase !== 'play'){ txt = S.winner ? `🏆 ${esc(nameOf(S, S.winner))} remporte la manche !` : ''; }
   else if (S.chal){
     const to = S.players[S.chal.to], fr = S.players[S.chal.from];
-    if (to.id === myId){ txt = `☠️ ${esc(fr.name)} t'a mis un +4 ! Tu encaisses ou tu contestes ?`; mine = true; }
+    who = to;
+    if (to.id === myId){ txt = `☠️ ${esc(fr.name)} t'a mis un +4 ! Encaisser ou contester ?`; mine = true; alert = true; }
     else txt = `${esc(to.name)} se prend un +4… contestera ? 👀`;
   } else {
-    const cur = S.players[S.turn];
+    const cur = S.players[S.turn]; who = cur;
     if (mi < 0) txt = `👀 Tu regardes. Au tour de ${esc(cur.name)}`;
     else if (cur.id === myId){
       mine = true;
-      if (S.stack > 0) txt = `🔥 Cumul à +${S.stack} ! Pose un +2 ou prends tout`;
+      if (S.stack > 0){ txt = `🔥 Cumul à +${S.stack} ! Pose un +2 ou prends tout`; alert = true; }
       else if (S.drawn != null) txt = 'Tu as pioché une carte jouable : pose-la ou passe';
       else txt = (myHand()||[]).some(c => canPlay(S,c)) ? 'À toi de jouer !' : 'Rien à poser… pioche !';
-    } else txt = `Au tour de ${esc(cur.name)}${cur.bot ? ' 🤖' : ''}…`;
+    } else txt = `⏳ Au tour de <b>${esc(cur.name)}</b>${cur.bot ? ' 🤖' : ''}`;
   }
-  if (st.dataset.k !== txt){ st.dataset.k = txt; st.innerHTML = txt; st.classList.remove('me'); if (mine){ void st.offsetWidth; st.classList.add('me'); } }
+  const key = txt + mine + alert;
+  if (st.dataset.k !== key){ st.dataset.k = key; st.innerHTML = txt ? `<div class="pill ${mine ? (alert ? 'me alert' : 'me') : ''}">${who ? avHTML(who) : '<span class="av" style="background:var(--yellow)">🏆</span>'}<span>${mine && !alert && txt === 'À toi de jouer !' ? '🎯 <b>À TOI DE JOUER !</b>' : txt}</span></div>` : ''; }
 }
 
 function renderHand(){
@@ -892,7 +1055,7 @@ function renderHand(){
   const myTurn = S.phase === 'play' && mi === S.turn && !S.chal;
   hw.className = myTurn ? 'myturn' : '';
   const sorted = sortHand(h);
-  const W = Math.min(window.innerWidth, document.documentElement.clientWidth) - 36;
+  const W = $('#handWrap').clientWidth - 36;
   const cw = parseFloat(getComputedStyle(document.documentElement).getPropertyValue('--cw')) || measureCw();
   const n = sorted.length;
   let step = n > 1 ? Math.min(cw * 0.78, (W - cw) / (n - 1)) : cw;
@@ -1021,7 +1184,9 @@ function showRules(){
 }
 function copyCode(){ if (!roomCode) return; try { navigator.clipboard.writeText(roomCode); toast('Code copié 📋'); } catch(e){ toast('Code : ' + roomCode); } }
 
-$('#scoreBtn').onclick = showScores; $('#logBtn').onclick = showLog; $('#rulesBtn').onclick = showRules;
+const toggleSide = open => { $('#side').classList.toggle('open', open); $('#sideBack').classList.toggle('open', open); };
+$('#sideBtn').onclick = () => toggleSide(true); $('#sideClose').onclick = () => toggleSide(false); $('#sideBack').onclick = () => toggleSide(false);
+$('#rulesBtn').onclick = showRules;
 $('#roomChip').onclick = copyCode;
 $('#muteBtn').onclick = () => { SND.on = !SND.on; lsSet('uno-mute', !SND.on); render(); if (SND.on){ initAudio(); sfx.click(); } };
 $('#quitBtn').onclick = () => {
@@ -1031,24 +1196,61 @@ $('#quitBtn').onclick = () => {
 };
 let _toastT;
 function toast(msg){ const t = $('#toast'); t.textContent = msg; t.classList.add('on'); clearTimeout(_toastT); _toastT = setTimeout(() => t.classList.remove('on'), 2000); }
-window.addEventListener('resize', () => { _cw = 0; if (S && S.phase !== 'lobby') renderHand(); });
+window.addEventListener('resize', () => { _cw = 0; if (S && mode && S.phase !== 'lobby'){ renderSeats(); renderHand(); } });
 
 /* ---------------- Réactions emoji (en ligne) ---------------- */
-const EMOS = ['😂','🔥','😱','😡','🤡','👏'];
-function buildEmoBar(){
-  const bar = $('#emoBar');
-  bar.innerHTML = `<button class="icon" id="emoToggle" title="Réactions">😀</button>` + EMOS.map(e => `<button class="icon e" data-e="${e}">${e}</button>`).join('');
-  $('#emoToggle').onclick = () => bar.classList.toggle('closed');
-  bar.querySelectorAll('[data-e]').forEach(b => b.onclick = () => { if (room){ try { room.send({t:'emo', e:b.dataset.e}); } catch(e){} } bar.classList.add('closed'); });
+const EMOS = ['😂','🔥','😱','😡','🤡','👏','😭','😎'];
+let lastReact = 0;
+function buildReacts(){
+  const bar = $('#reacts');
+  bar.innerHTML = EMOS.map(e => `<button data-e="${e}" title="Réagir">${e}</button>`).join('');
+  bar.querySelectorAll('[data-e]').forEach(b => b.onclick = () => react(b.dataset.e));
+}
+function react(e){
+  initAudio();
+  if (Date.now() - lastReact < 800) return;
+  lastReact = Date.now();
+  const bar = $('#reacts'); bar.classList.add('cool'); setTimeout(() => bar.classList.remove('cool'), 800);
+  if (mode === 'online' && room){ try { room.send({t:'emo', e}); } catch(x){} }
+  else showEmote(myId, e);
+}
+/* Les bots réagissent aussi (c'est l'hôte qui décide) */
+function botReact(ns){
+  if (!ns || !ns.ev || !ns.players) return;
+  const bots = ns.players.filter(p => p.bot); if (!bots.length) return;
+  const others = id => bots.filter(b => b.id !== id);
+  let who = null, e = null;
+  for (const ev of ns.ev){
+    const b = bots.find(p => p.id === ev.p);
+    if ((ev.k === 'take' && ev.n >= 4) || ev.k === 'caught' || ev.k === 'contestFail' || ev.k === 'busted'){
+      if (b && Math.random() < .6){ who = b; e = pick(['😡','😭','😱']); }
+      else if (Math.random() < .4 && others(ev.p).length){ who = pick(others(ev.p)); e = pick(['😂','🤡','🔥']); }
+    } else if (ev.k === 'wild4' && b && Math.random() < .5){ who = b; e = pick(['😱','😡']); }
+    else if (ev.k === 'stack' && ev.n >= 6 && Math.random() < .5){ who = pick(bots); e = '🔥'; }
+    else if (ev.k === 'uno' && Math.random() < .25 && others(ev.p).length){ who = pick(others(ev.p)); e = '😱'; }
+    else if (ev.k === 'win'){ if (b){ who = b; e = '😎'; } else if (Math.random() < .6){ who = pick(bots); e = '👏'; } }
+  }
+  if (!who || !e) return;
+  const id = who.id;
+  setTimeout(() => {
+    if (mode === 'online' && room){ try { room.send({t:'emo', e, p:id}); } catch(x){} }
+    else if (mode === 'solo') showEmote(id, e);
+  }, rnd(600, 1500));
 }
 function showEmote(pid, e){
   if (!EMOS.includes(e)) return;
-  const r = seatRect(pid);
-  for (let k = 0; k < 3; k++){
+  const seat = document.querySelector(`#seats [data-pid="${CSS.escape(String(pid))}"]`);
+  if (seat){
+    seat.querySelectorAll('.bubble').forEach(b => b.remove());
+    const b = document.createElement('div'); b.className = 'bubble'; b.textContent = e; seat.appendChild(b);
+    setTimeout(() => b.remove(), 2400);
+  }
+  const r = seatRect(pid, true);
+  for (let k = 0; k < 4; k++){
     const d = document.createElement('div'); d.className = 'floater'; d.textContent = e;
-    d.style.left = (r.x + r.w/2 - 17 + rnd(-20,20)) + 'px'; d.style.top = (r.y + r.h/2 - 17) + 'px';
+    d.style.left = (r.x + r.w/2 - 17 + rnd(-24,24)) + 'px'; d.style.top = (r.y + r.h/2 - 17) + 'px';
     $('#fx').appendChild(d);
-    d.animate([{transform:'translateY(0) scale(.5)', opacity:0},{transform:'translateY(-30px) scale(1.3)', opacity:1, offset:.2},{transform:`translateY(-${rnd(110,170)}px) scale(1) rotate(${rnd(-30,30)}deg)`, opacity:0}], {duration:1700 + k*200, delay:k*120, easing:'ease-out', fill:'both'}).onfinish = () => d.remove();
+    d.animate([{transform:'translateY(0) scale(.5)', opacity:0},{transform:'translateY(-30px) scale(1.3)', opacity:1, offset:.2},{transform:`translate(${rnd(-40,40)}px,-${rnd(110,180)}px) scale(1) rotate(${rnd(-30,30)}deg)`, opacity:0}], {duration:1700 + k*200, delay:k*110, easing:'ease-out', fill:'both'}).onfinish = () => d.remove();
   }
   sfx.pop();
 }
@@ -1057,9 +1259,10 @@ function showEmote(pid, e){
    EFFETS SPÉCIAUX
    ===================================================================== */
 function rectOf(el){ if (!el) return null; const r = el.getBoundingClientRect(); return {x:r.left, y:r.top, w:r.width, h:r.height}; }
-function seatRect(pid){
+function seatRect(pid, seatOnly){
+  if (pid === myId && seatOnly){ const s = rectOf(document.querySelector(`#seats [data-pid="${CSS.escape(String(pid))}"]`)); if (s) return s; }
   if (pid === myId){ const hw = rectOf($('#handWrap')); return {x:hw.x + hw.w/2 - 40, y:hw.y + 10, w:80, h:80}; }
-  const el = document.querySelector(`#opps [data-pid="${CSS.escape(String(pid))}"]`);
+  const el = document.querySelector(`#seats [data-pid="${CSS.escape(String(pid))}"]`);
   return rectOf(el) || {x:innerWidth/2 - 30, y:40, w:60, h:40};
 }
 function captureRects(ns){
@@ -1308,7 +1511,7 @@ $('#resumeBtn').onclick = () => { initAudio(); startSolo(true); };
 $('#createBtn').onclick = () => { initAudio(); joinRoom(genCode(), true); };
 $('#joinBtn').onclick = () => { initAudio(); joinRoom($('#code').value, true); };
 $('#code').addEventListener('keydown', e => { if (e.key === 'Enter') $('#joinBtn').click(); });
-buildEmoBar();
+buildReacts();
 
 (async function boot(){
   $('#pseudo').value = lsGet('uno-pseudo', '') || '';
