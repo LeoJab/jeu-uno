@@ -413,10 +413,10 @@ function avatarOf(p){
   const u = (typeof S !== 'undefined' && S && S.av && S.av[p.id]) || avMap[p.id] || p.avatar || (p.id === myId ? myAvatar : null);
   return okUrl(u) ? u : null;
 }
-function avHTML(p){
+function avHTML(p, cam){
   const ini = p.bot ? '🤖' : esc((p.name||'?').trim().charAt(0).toUpperCase() || '?');
   const url = avatarOf(p);
-  return `<span class="av" style="background:hsl(${hueOf(p.id)} 75% 52%)">${ini}${url ? `<img src="${esc(url)}" alt="" referrerpolicy="no-referrer" onerror="this.remove()">` : ''}</span>`;
+  return `<span class="av"${cam && !p.bot ? ` data-chadgang-id="${esc(p.id)}"` : ''} style="background:hsl(${hueOf(p.id)} 75% 52%)">${ini}${url ? `<img src="${esc(url)}" alt="" referrerpolicy="no-referrer" onerror="this.remove()">` : ''}</span>`;
 }
 
 const BOT_NAMES = ['Bot Kévin','Bot Josiane','Bot Jean-Mich','Bot Ginette','Bot Brandon','Bot Huguette','Bot Titouan','Bot Raymonde','Bot Kylian','Bot Mamie Lulu'];
@@ -683,7 +683,22 @@ function receive(ns, silent){
     clearTimeout(summaryTimer);
     summaryTimer = setTimeout(() => { if (S && (S.phase==='roundEnd'||S.phase==='gameEnd') && !summaryClosed) showSummary(); }, silent ? 50 : 2200);
   }
+  reportGameEnd();
   if (isHost()) scheduleHost();
+}
+
+/* Classement « all time » du hub : chaque joueur envoie SON résultat, une seule fois par partie terminée */
+function reportGameEnd(){
+  if (mode !== 'online' || !S || S.phase !== 'gameEnd' || !S.gameId) return;
+  if (!(window.ChadGang && ChadGang.finPartie)) return;
+  const me = S.players.find(p => p.id === myId && !p.bot); if (!me) return;
+  const done = lsGet('uno-reported', []);
+  const key = S.gameId + '|' + myId;
+  if (done.includes(key)) return;
+  lsSet('uno-reported', done.concat(key).slice(-50));
+  const best = Math.max(...S.players.filter(p => !p.bot).map(p => S.scores[p.id] || 0), ...S.players.filter(p => p.bot).map(p => S.scores[p.id] || 0));
+  const mine = S.scores[myId] || 0;
+  try { ChadGang.finPartie({gagne: mine >= best, partie: S.gameId, score: mine}).catch(() => {}); } catch(e){}
 }
 
 function commit(ns){
@@ -786,6 +801,7 @@ function hostStart(){
     const pl = lobbyPlayers(L);
     if (pl.length < 2) return;
     L.scores = {}; L.round = 0; L.log = [];
+    L.gameId = (String(roomCode || 'SOLO') + '-' + Date.now().toString(36)).replace(/[^A-Za-z0-9\-_.:]/g, '').slice(0, 64);
     startRound(L, pl);
   });
 }
@@ -1014,7 +1030,7 @@ function renderSeats(){
     const turnTxt = isMe ? 'À TOI !' : (S.chal && S.chal.to === seatOf(S, p.id) ? 'RÉPOND AU +4' : 'SON TOUR');
     return `<div class="seat ${isTurn?'turn':''} ${isMe?'me':''} ${away?'away':''} ${n>0 && n<=2 && S.phase==='play'?'danger':''}" data-pid="${esc(p.id)}" style="left:${x.toFixed(1)}px;top:${y.toFixed(1)}px">
       ${isTurn ? `<div class="tag-turn">▼ ${turnTxt}</div>` : ''}
-      <div class="avw">${avHTML(p)}<span class="cntb" title="${n} cartes">${n}</span></div>
+      <div class="avw">${avHTML(p, true)}<span class="cntb" title="${n} cartes">${n}</span></div>
       <div class="info">
         <div class="nm">${esc(isMe ? (p.name === 'Toi' ? 'Toi' : p.name + ' (toi)') : p.name)}</div>
         <div class="sub">${S.scores[p.id]||0} pts${tags ? ' · ' + tags : ''}</div>
